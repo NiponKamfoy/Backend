@@ -32,7 +32,7 @@ def convert_nc_json(province, date, index, index_folder):
 # E:\Data_Project\ensemble
 #"C:\Users\s6201\Downloads\Data_Project\data_project\ensemble"
     dir_data = Config()
-    dir_load_data = dir_data["data_index_path"]
+    dir_load_data = f"{dir_data['data_index_path']}/{index.split('_')[0]}"
     load_data = open(rf'{dir_load_data}\{index_folder}/{index}/{province}.json')
     data_province = json.load(load_data)
     time_unit = data_province['properties']['date_type']
