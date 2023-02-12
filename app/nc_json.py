@@ -14,8 +14,8 @@ def get_array_day(dates):
         return day_list
     else:
         month = {month: index for index, month in enumerate(calendar.month_abbr) if month}
-        sdate = date(int(temp_date[3]), month[temp_date[1]], int(temp_date[2]))   # start date
-        edate = date(int(temp_date[8]), month[temp_date[6]], int(temp_date[7]))   # end date
+        sdate = date(int(temp_date[3]), month[temp_date[2]], int(temp_date[1]))   # start date
+        edate = date(int(temp_date[8]), month[temp_date[7]], int(temp_date[6]))   # end date
 
         delta = edate - sdate       # as timedelta
         for i in range(delta.days + 1):
@@ -32,7 +32,11 @@ def convert_nc_json(province, date, index, index_folder):
 # E:\Data_Project\ensemble
 #"C:\Users\s6201\Downloads\Data_Project\data_project\ensemble"
     dir_data = Config()
-    dir_load_data = f"{dir_data['data_index_path']}/{index.split('_')[0]}"
+    index_name = index.split('_')[0]
+    if( index_folder == '_SPI'):
+        index_name = index.split('_')[0][:-2]
+    
+    dir_load_data = f"{dir_data['data_index_path']}/{index_name}"
     load_data = open(rf'{dir_load_data}\{index_folder}/{index}/{province}.json')
     data_province = json.load(load_data)
     time_unit = data_province['properties']['date_type']
@@ -78,9 +82,25 @@ def convert_nc_json(province, date, index, index_folder):
         time_series_data.append({"date": date, 'index': sum(temp_time_series[date])/len(temp_time_series[date])})
     index_center = len(data_province['fetures'])//2
     temp_data[index_center]['properties']['time_index'] = True
-    # temp_data[index_center]['properties']['time_series'] = time_series_data
     temp_data[index_center]['properties']['time_series'] = sorted(time_series_data, key=lambda i: i['date'])
-    
+
+    if( index_folder == '_SPI'):
+        seasonal_data_tmp = {}
+        for data in time_series_data:
+            month = data['date'].split("-")[1]
+            if ( month not in seasonal_data_tmp.keys()):
+                seasonal_data_tmp[month] = [data['index']]
+            else :
+                seasonal_data_tmp[month].append(data['index'])
+
+        seasonal_data = []
+        tmp_dict = {}
+        for i in seasonal_data_tmp.keys():
+            tmp_dict['month'] = i
+            tmp_dict['value'] = sum(seasonal_data_tmp[i]) / len(seasonal_data_tmp[i])
+            seasonal_data.append(tmp_dict)
+            tmp_dict = {}
+        temp_data[index_center]['properties']['seasonal'] = sorted(seasonal_data, key=lambda i: i['month'])
     # temp_data.append(time_series_data)
     test = temp_data[index_center]['properties']['time_series']
 

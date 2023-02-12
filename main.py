@@ -62,3 +62,8 @@ def getGridSpei(data_index: str, index_folder: str, p_name: str, date:str = '200
         temp = convert_nc_json(p_name.replace('_', ' '), date, data_index, index_folder)
         return temp
     return x_access_token == data['key']
+
+
+if __name__ == "__main__":
+    uvicorn.run(app,host="127.0.0.1", port=8000)
+    
