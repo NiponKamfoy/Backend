@@ -122,17 +122,25 @@ def convert_nc_json(province, index, location_index, index_type):
 
                 intersect = polygon_province.intersection(polygon_grid)  
 
-                list_coordinates = []
                 # format coordinate to form of geojson 
+                list_coordinates = []
                 if(intersect.geom_type == 'Polygon'):
                     for i in list(intersect.exterior.coords):
                         list_coordinates.append(list(i))
-                else :
-                    for i in intersect:
-                        temp = []
-                        for j in list(i.exterior.coords):
-                            temp.append(list(j))
-                        list_coordinates.append(temp)
+                elif (intersect.geom_type == 'MultiPolygon'):
+                    polygons = list(intersect.geoms) # use .geoms for fixed "Multipolygon" can't iteration
+                    for poly in polygons:
+                        tmp = []
+                        for i in list(poly.exterior.coords):
+                            tmp.append(list(i))
+                        list_coordinates.append(tmp)
+
+                # else :
+                #     for i in intersect:
+                #         temp = []
+                #         for j in list(i.exterior.coords):
+                #             temp.append(list(j))
+                #         list_coordinates.append(temp)
 
                 grid ={
                     "type":"Feature",
@@ -150,8 +158,8 @@ def convert_nc_json(province, index, location_index, index_type):
                 data_form["fetures"].append(grid)
     return data_form
 
-province_load = open(r'province.json', encoding='utf-8')
-SEA_load = open(r'southeast-asia_.json', encoding='utf-8')
+province_load = open(r'F:\Backend\app\prepare_data\province.json', encoding='utf-8')
+SEA_load = open(r"F:\southeast_asia.json", encoding='utf-8')
 data_province = json.load(province_load)
 data_SEA = json.load(SEA_load)
 # load_config = open(r"D:\Project\Mix_Project\Project_I\flask_api\config.json")

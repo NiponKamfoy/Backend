@@ -2,10 +2,10 @@ import json
 class GettingArea:
     # Opening JSON file
     def __init__(self):
-        f = open(r'province.json', encoding='utf-8')
+        f = open(r"F:\Backend\app\prepare_data\province.json", encoding='utf-8')
         self.data = json.load(f)
 
-        f_all = open(r'southeast-asia_.json', encoding='utf-8')
+        f_all = open(r"F:\southeast_asia.json", encoding='utf-8')
         self.data_sea = json.load(f_all)
         f.close()
         f_all.close()
@@ -16,8 +16,8 @@ class GettingArea:
                 "features":[]
                 }
         #get all province in thailand
-        SEA = ['Brunei Darussalam', 'Cambodia', 'Malaysia', 'Indonesia', 'Laos (Lao People’s Democratic Republic)', 'Myanmar'
-                , 'Philippines', 'Thailand', 'Timor-Leste', 'Vietnam']
+        SEA = ['Brunei Darussalam', 'Cambodia', 'Malaysia', 'Indonesia', "Lao People's Democratic Republic", 'Myanmar'
+                , 'Philippines', 'Thailand', 'Timor-Leste', 'Vietnam', 'Singapore']
         if(p_name in SEA):
             # temp_json['features']=data_all
             # temp_json['features']['properties']['id'] = 99
