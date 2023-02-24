@@ -40,6 +40,10 @@ class LoginItem(BaseModel):
     username: str
     password: str
 
+@app.get('/')
+def hello():
+    return {'message': 'welcome to my FastAPI'}
+
 @app.post("/login")
 async def user_login(loginitem:LoginItem):
 
