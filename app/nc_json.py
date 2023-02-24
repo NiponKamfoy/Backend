@@ -38,12 +38,12 @@ def convert_nc_json(province, date, index, index_folder):
     if( index_folder == '_SPI'):
         index_name = index.split('_')[0][:-2]
     
-    # dir_load_data = f"{dir_data['data_index_path']}/{index_name}"
-    # load_data = open(rf'{dir_load_data}\{index_folder}/{index}/{province}.json')
-    # data_province = json.load(load_data)
-    load_data = path.abspath(path.join(basepath, "..", "data", index_name, index_folder, index, province+'.json'))
-    f = open(load_data, "r")
-    data_province = json.load(f)
+    dir_load_data = f"{dir_data['data_index_path']}/{index_name}"
+    load_data = open(rf'{dir_load_data}\{index_folder}/{index}/{province}.json')
+    data_province = json.load(load_data)
+    # load_data = path.abspath(path.join(basepath, "..", "data", index_name, index_folder, index, province+'.json'))
+    # f = open(load_data, "r")
+    # data_province = json.load(f)
 
     time_unit = data_province['properties']['date_type']
     # it used to check string date format
