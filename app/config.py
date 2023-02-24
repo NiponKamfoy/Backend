@@ -2,7 +2,7 @@ def Config():
     config = {
                 "raw_data_path" : r"F:\data_test", # path of NC file
                 "output_path" : r"F:\data_project", # path of data json
-                "data_index_path" : "../data" # path for api 
+                "data_index_path" : r"F:\Gen_data" # path for api 
             }
     return config
 
