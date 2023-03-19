@@ -42,7 +42,7 @@ class LoginItem(BaseModel):
 
 @app.get('/')
 def hello():
-    return {'message': 'welcome to my FastAPI'}
+    return {'message': 'welcome to my FastAPI test'}
 
 @app.post("/login")
 async def user_login(loginitem:LoginItem):
