@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from fastapi.encoders import jsonable_encoder
 from app.nc_json import convert_nc_json
 from fastapi.middleware.cors import CORSMiddleware
-
+from app.get_meta_data import get_list_data
 
 f = open(r'token.json')
 data = json.load(f)
@@ -66,3 +66,11 @@ def getGridSpei(data_index: str, index_folder: str, p_name: str, date:str = '200
         temp = convert_nc_json(p_name.replace('_', ' '), date, data_index, index_folder)
         return temp
     return x_access_token == data['key']
+
+@app.get('/get_meta_data')
+def getMetaData():
+    meta_data = get_list_data()
+    return meta_data
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
