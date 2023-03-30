@@ -7,4 +7,4 @@ services:
       - "8000:8000"
     volumes: 
       - .:/app
-      - F:\Gen_data:/app/data
+      - F:\New_data2:/app/data
