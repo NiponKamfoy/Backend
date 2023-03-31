@@ -27,13 +27,22 @@ def get_array_day(dates):
 def get_data_histrogram(all_grid_data):
     histrogram_data = {}
     for grid in all_grid_data:
-        index = round(grid['properties']['index'])
+        index_value = grid['properties']['index']
+        if (grid['properties']['spi']):
+            index = float("{:.2f}".format(grid['properties']['index']))
+        else :
+            index = round(index_value)
+
+        
         if (str(index) not in histrogram_data.keys()):
             histrogram_data[str(index)] = 1
         else :
             histrogram_data[str(index)] += 1
     myKeysStr = list(histrogram_data.keys())
-    myKeys = [int(i) for i in myKeysStr]
+    if (all_grid_data[0]['properties']['spi']):
+        myKeys = [float(i) for i in myKeysStr]
+    else :
+        myKeys = [int(i) for i in myKeysStr]
     myKeys.sort()
     sorted_dict = [{"value": i, "frequency": histrogram_data[str(i)]} for i in myKeys]
     return sorted_dict
@@ -41,7 +50,8 @@ def get_data_histrogram(all_grid_data):
 def get_data_histrogram1(all_grid_data):
     list_index_value = []
     for grid in all_grid_data:
-        index = round(grid['properties']['index'])
+        # float("{:.2f}".format(grid['properties']['index']))
+        index = round(float("{:.2f}".format(grid['properties']['index'])))
         list_index_value.append(index)
     return list_index_value
 
@@ -80,6 +90,7 @@ def convert_nc_json(province, date, index, index_folder):
     temp_data = data_province['fetures']
        
     temp_time_series = {}
+    temp_index_value = []
     for ind,grid_data in enumerate(data_province['fetures']):
         value = 0
         for day in day_list:
@@ -99,9 +110,15 @@ def convert_nc_json(province, date, index, index_folder):
                 if (grid_data['properties']['time_index'][str(index_month)] != '--'):
                     value += float(grid_data['properties']['time_index'][str(index_month)])
                     temp_time_series[day].append(float(grid_data['properties']['time_index'][str(index_month)]))
-
-        value /= len(day_list)
-        temp_data[ind]['properties']['index'] = value
+        if (value == float('inf')):
+            value = 0
+        else :
+            value /= len(day_list)
+        temp_data[ind]['properties']['index'] = float("{:.4f}".format(value))
+        temp_index_value.append(float("{:.4f}".format(value)))
+        temp_data[ind]['properties']['spi'] = False
+        if(index_folder == '_SPI'):
+            temp_data[ind]['properties']['spi'] = True
 
         # delete time_index when send data from api 
         temp_data[ind]['properties']['time_index'] = False
@@ -118,9 +135,13 @@ def convert_nc_json(province, date, index, index_folder):
         for data in time_series_data:
             month = data['date'].split("-")[1]
             if ( month not in seasonal_data_tmp.keys()):
+                temp = data['index']
                 seasonal_data_tmp[month] = [data['index']]
             else :
-                seasonal_data_tmp[month].append(data['index'])
+                if(data['index'] == float('inf')):
+                    seasonal_data_tmp[month].append(0)
+                else :
+                    seasonal_data_tmp[month].append(data['index'])
 
         seasonal_data = []
         tmp_dict = {}
@@ -129,12 +150,12 @@ def convert_nc_json(province, date, index, index_folder):
             tmp_dict['value'] = sum(seasonal_data_tmp[i]) / len(seasonal_data_tmp[i])
             seasonal_data.append(tmp_dict)
             tmp_dict = {}
-        temp_data[index_center]['properties']['seasonal'] = sorted(seasonal_data, key=lambda i: i['month'])
+        # temp_data[index_center]['properties']['seasonal'] = sorted(seasonal_data, key=lambda i: i['month'])
     # temp_data.append(time_series_data)
     test = temp_data[index_center]['properties']['time_series']
     histrogram_data = get_data_histrogram(temp_data)
     temp_data[index_center]['properties']['histrogram'] = histrogram_data
-
+    
     return temp_data
 
 
