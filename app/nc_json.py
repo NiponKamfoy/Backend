@@ -1,4 +1,4 @@
-import calendar,json,math
+import calendar,json
 from datetime import date, timedelta, datetime
 from dateutil import relativedelta
 from app.config import Config
@@ -23,6 +23,29 @@ def get_array_day(dates):
             day_list.append(day.strftime(str_date))
             temp = list(set(day_list))
         return temp
+
+def get_data_histrogram(all_grid_data):
+    histrogram_data = {}
+    for grid in all_grid_data:
+        index = round(grid['properties']['index'])
+        if (str(index) not in histrogram_data.keys()):
+            histrogram_data[str(index)] = 1
+        else :
+            histrogram_data[str(index)] += 1
+    myKeysStr = list(histrogram_data.keys())
+    myKeys = [int(i) for i in myKeysStr]
+    myKeys.sort()
+    sorted_dict = [{"value": i, "frequency": histrogram_data[str(i)]} for i in myKeys]
+    return sorted_dict
+
+def get_data_histrogram1(all_grid_data):
+    list_index_value = []
+    for grid in all_grid_data:
+        index = round(grid['properties']['index'])
+        list_index_value.append(index)
+    return list_index_value
+
+
 from os import path
 
 basepath = path.dirname(__file__)
@@ -38,12 +61,12 @@ def convert_nc_json(province, date, index, index_folder):
     if( index_folder == '_SPI'):
         index_name = index.split('_')[0][:-2]
     
-    # dir_load_data = f"{dir_data['data_index_path']}/{index_name}"
-    # load_data = open(rf'{dir_load_data}\{index_folder}/{index}/{province}.json')
-    # data_province = json.load(load_data)
-    load_data = path.abspath(path.join(basepath, "..", "data", index_name, index_folder, index, province+'.json'))
-    f = open(load_data, "r")
-    data_province = json.load(f)
+    dir_load_data = f"{dir_data['data_index_path']}/{index_name}"
+    load_data = open(rf'{dir_load_data}\{index_folder}/{index}/{province}.json')
+    data_province = json.load(load_data)
+    # load_data = path.abspath(path.join(basepath, "..", "data", index_name, index_folder, index, province+'.json'))
+    # f = open(load_data, "r")
+    # data_province = json.load(f)
 
     time_unit = data_province['properties']['date_type']
     # it used to check string date format
@@ -109,6 +132,8 @@ def convert_nc_json(province, date, index, index_folder):
         temp_data[index_center]['properties']['seasonal'] = sorted(seasonal_data, key=lambda i: i['month'])
     # temp_data.append(time_series_data)
     test = temp_data[index_center]['properties']['time_series']
+    histrogram_data = get_data_histrogram(temp_data)
+    temp_data[index_center]['properties']['histrogram'] = histrogram_data
 
     return temp_data
 
