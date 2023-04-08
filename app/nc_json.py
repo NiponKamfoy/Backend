@@ -57,6 +57,7 @@ def get_data_histrogram1(all_grid_data):
 
 
 from os import path
+from decimal import Decimal
 
 basepath = path.dirname(__file__)
 def convert_nc_json(province, date, index, index_folder):
@@ -86,7 +87,7 @@ def convert_nc_json(province, date, index, index_folder):
         str_date = '%Y-%m'
 
     day_list = get_array_day(date)
-
+    temp_day_sort = day_list.sort()
     temp_data = data_province['fetures']
        
     temp_time_series = {}
@@ -99,7 +100,8 @@ def convert_nc_json(province, date, index, index_folder):
             if(time_unit == "year"):
                 str_index_time = str(int(day)-int(data_province['properties']['start_time']))
                 if (grid_data['properties']['time_index'][str_index_time] != '--'):
-                    value += float(grid_data['properties']['time_index'][str_index_time])
+                    value += float("{:.4f}".format(float(grid_data['properties']['time_index'][str_index_time])))
+                    # value += float(grid_data['properties']['time_index'][str_index_time])
                     temp_time_series[day].append(float(grid_data['properties']['time_index'][str_index_time]))
             else :
                 date_input = datetime.strptime(day, "%Y-%m")
@@ -108,12 +110,14 @@ def convert_nc_json(province, date, index, index_folder):
                 index_month = r.months + (12*r.years)
                 
                 if (grid_data['properties']['time_index'][str(index_month)] != '--'):
-                    value += float(grid_data['properties']['time_index'][str(index_month)])
+                    value += float("{:.4f}".format( float(grid_data['properties']['time_index'][str(index_month)])))
+                    # value += float(grid_data['properties']['time_index'][str(index_month)])   
                     temp_time_series[day].append(float(grid_data['properties']['time_index'][str(index_month)]))
-        if (value == float('inf')):
+        if (value == float('inf') or value == Decimal('Infinity')):
             value = 0
         else :
             value /= len(day_list)
+
         temp_data[ind]['properties']['index'] = float("{:.4f}".format(value))
         temp_index_value.append(float("{:.4f}".format(value)))
         temp_data[ind]['properties']['spi'] = False
@@ -125,7 +129,10 @@ def convert_nc_json(province, date, index, index_folder):
 
     time_series_data = []
     for date in temp_time_series.keys():
-        time_series_data.append({"date": date, 'index': sum(temp_time_series[date])/len(temp_time_series[date])})
+        if (sum(temp_time_series[date])/len(temp_time_series[date]) == Decimal('Infinity')):
+            time_series_data.append({"date": date, 'index': 0})
+        else :
+            time_series_data.append({"date": date, 'index': sum(temp_time_series[date])/len(temp_time_series[date])})
     index_center = len(data_province['fetures'])//2
     temp_data[index_center]['properties']['time_index'] = True
     temp_data[index_center]['properties']['time_series'] = sorted(time_series_data, key=lambda i: i['date'])
@@ -138,8 +145,8 @@ def convert_nc_json(province, date, index, index_folder):
                 temp = data['index']
                 seasonal_data_tmp[month] = [data['index']]
             else :
-                if(data['index'] == float('inf')):
-                    seasonal_data_tmp[month].append(0)
+                if(data['index'] == float('inf') or data['index'] == Decimal('Infinity')):
+                    seasonal_data_tmp[month].append(0.0)
                 else :
                     seasonal_data_tmp[month].append(data['index'])
 
@@ -150,7 +157,7 @@ def convert_nc_json(province, date, index, index_folder):
             tmp_dict['value'] = sum(seasonal_data_tmp[i]) / len(seasonal_data_tmp[i])
             seasonal_data.append(tmp_dict)
             tmp_dict = {}
-        # temp_data[index_center]['properties']['seasonal'] = sorted(seasonal_data, key=lambda i: i['month'])
+        temp_data[index_center]['properties']['seasonal'] = sorted(seasonal_data, key=lambda i: i['month'])
     # temp_data.append(time_series_data)
     test = temp_data[index_center]['properties']['time_series']
     histrogram_data = get_data_histrogram(temp_data)

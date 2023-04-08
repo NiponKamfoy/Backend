@@ -64,6 +64,7 @@ async def user_login(loginitem:LoginItem):
 def getGridSpei(data_index: str, index_folder: str, p_name: str, date:str = '2006-01', x_access_token: Union[list[str], None] = Header(default=None)):
     if (x_access_token != None and x_access_token[0] == data['key']):
         temp = convert_nc_json(p_name.replace('_', ' '), date, data_index, index_folder)
+        json_str = json.dumps(temp)
         return temp
     return x_access_token == data['key']
 
