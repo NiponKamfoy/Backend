@@ -33,7 +33,8 @@ def get_data_histrogram(all_grid_data):
         else :
             index = round(index_value)
 
-        
+        if (str(index) == "-0" or str(index) == "-0.0"):
+            index = 0.0
         if (str(index) not in histrogram_data.keys()):
             histrogram_data[str(index)] = 1
         else :
